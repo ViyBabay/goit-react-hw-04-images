@@ -6,16 +6,14 @@ import style from './ImageGallery.module.css';
 export const ImageGallery = ({ images, onClick }) => {
   return (
     <ul className={style.ImageGallery}>
-      {images.map(({ id, webformatURL, largeImageURL }) => {
-        return (
-          <ImageGalleryItem
-            key={id}
-            webformatURL={webformatURL}
-            largeImageURL={largeImageURL}
-            onClick={onClick}
-          />
-        );
-      })}
+      {images.map((image, index) => (
+        <ImageGalleryItem
+          key={index}
+          webformatURL={image.webformatURL}
+          largeImageURL={image.largeImageURL}
+          onClick={onClick}
+        />
+      ))}
     </ul>
   );
 };
