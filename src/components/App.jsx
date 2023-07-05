@@ -15,26 +15,26 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [largePhoto, setLargePhoto] = useState('');
+  const [showBtn, setShowBtn] = useState(false);
 
   useEffect(() => {
-    if (page !== 1 || imageName !== '') {
-      setIsLoading(true);
-      searchImage(imageName, page)
-        .then(data => {
-          const newImages = data.hits;
-          if (newImages.length === 0) {
-            Notiflix.Notify.warning(
-              'Sorry, there are no results for your query. Try another query.'
-            );
-          }
-          setImages(prevImages => [...prevImages, ...newImages]);
-        })
-        .catch(err => {
-          console.error('Request error', err);
-          Notiflix.Notify.failure('Request error');
-        })
-        .finally(() => setIsLoading(false));
-    }
+    if (!imageName) return;
+    setIsLoading(true);
+    searchImage(imageName, page)
+      .then(({ hits, totalHits }) => {
+        setImages(prev => [...prev, ...hits]);
+        setShowBtn(page < Math.ceil(totalHits / 12));
+        if (hits.length === 0) {
+          Notiflix.Notify.warning(
+            'Sorry, there are no results for your query. Try another query.'
+          );
+        }
+      })
+      .catch(err => {
+        console.error('Request error', err);
+        Notiflix.Notify.failure('Request error');
+      })
+      .finally(() => setIsLoading(false));
   }, [page, imageName]);
 
   const handelFormSubmit = imageName => {
@@ -65,7 +65,7 @@ export const App = () => {
       {largePhoto && (
         <Modal largePhotoURL={largePhoto} closeModal={onCloseModal} />
       )}
-      {images.length > 0 && <Button onClick={onLoadMore} loading={isLoading} />}
+      {showBtn && <Button onClick={onLoadMore} loading={isLoading} />}
     </div>
   );
 };
